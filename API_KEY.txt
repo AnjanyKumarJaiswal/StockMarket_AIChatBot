@@ -1,0 +1,2 @@
+API_KEY = " AIzaSyD98IrWpvfg_I8vubfT-3m1bUHsKCZ90ys"
+The API KEY used is a official key taken from google - generative ai 
