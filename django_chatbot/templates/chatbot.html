@@ -1,193 +1,207 @@
-{% extends 'base.html' %}
-
-{% block styles %}
-<style>
-    body, html {
-      height: 100%;
-    }
-
-    .messages-box {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .messages-list {
-      padding-left: 0;
-    }
-
-    .message {
-      margin-bottom: 15px;
-      list-style: none;
-    }
-
-    .message-text {
-      padding: 10px;
-      border-radius: 5px;
-    }
-
-    .sent {
-      background-color: #dcf8c6;
-      align-self: flex-end;
-    }
-
-    .received {
-      background-color: #f1f0f0;
-      align-self: flex-start;
-    }
-
-    .message-form {
-      display: flex;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 10px;
-      background-color: #f8f9fa;
-    }
-
-    .message-input {
-      flex: 1;
-      border-radius: 0;
-      border-right: none;
-    }
-
-    .btn-send {
-      border-radius: 0;
-    }
-
-    .chat-container {
-      height: 100%;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Market Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-image: url('https://img.freepik.com/free-vector/gradient-stock-market-concept_23-2149166910.jpg?w=900&t=st=1699707602~exp=1699708202~hmac=61bcfea2a200c106a70f170c24be8597bdf638ba19ed447d39143744a40e6e92');
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      align-items: center;
+    }
+    #navbar {
+      background-color: black;
+      overflow: hidden;
+      width: 100%;
+    }
+    #navbar a {
+      float: left;
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+    #navbar b{
+      float: right;
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 10px 10px;
+      text-decoration: none;
+
+    }
+    #navbar a:hover {
+      background-color: #ddd;
+      color: black;
+    }
+
+    #chat-container {
+      max-width: 600px;
+      width: 100%;
+      margin: 120px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      padding: 100px;
+      overflow-y: auto;
+      max-height: 80vh;
+      flex: 1;
+    }
+    #input-container {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px;
+    }
+    #user-input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    #send-button {
+      padding: 8px;
+      border: seashell;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #dcf8c6;
     }
   </style>
-{% endblock %}
-
-
-{% block content %}
-<div class="chat-container">
-  <div class="card flex-grow-1">
-    <div class="card-header bg-primary text-white">Chat</div>
-    {% if user.is_authenticated %}
-    <div class="card-header bg-primary text-white"><b>Welcome, {{user.username}}</b>   <a style="color: yellow;" href="logout">Logout</a></div>
-    {% else %}
-    <div class="card-header bg-primary text-white"><a style="color: yellow" href="login">Login</a>   <a style="color: yellow;" href="register">Register</a></div>
-    {% endif %}
-    <div class="card-body messages-box">
-      
-      <ul class="list-unstyled messages-list">
-        
-        <!-- <li class="message received">
-          <div class="message-text">
-            <div class="message-sender">
-              <b>AI Chatbot</b>
-            </div>
-            <div class="message-content">
-              Hi {{user.username}}, I am your AI Chatbot, you can ask me anything.
-            </div>
-          </div>
-        </li> -->
-
-        {% for chat in chats %}
-          {% if chat.user == request.user %}
-
-            <li class="message sent">
-          <div class="message-text">
-            <div class="message-sender">
-              <b>You</b>
-            </div>
-            <div class="message-content">
-              {{chat.message}}
-            </div>
-          </div>
-        </li>
-
-        <li class="message received">
-          <div class="message-text">
-            <div class="message-sender">
-              <b>AI Chatbot</b>
-            </div>
-            <div class="message-content">
-              {{chat.response}}
-            </div>
-          </div>
-        </li>
-
-          {% endif %}
-        {% endfor %}
-        
-      </ul>
-      
-    </div>
-    <br><br>
-    <br><br>
-    <br><br>
+</head>
+<body>
+  <div id="navbar">
+    <a href=""http://127.0.0.1:8000/"">Home</a>
+    <a href="https://www.moneycontrol.com/stocksmarketsindia/" target="_blank">News</a>
+    <a href="#contact">Contact</a>
+    <a href="file:///D:/ANJANY_IMPORTANT_FILES/Programming_goals/Python_Programming/Mini_Project/django_chatbot/templates/Login-Page.html">Sign Up/Login In</a>
+    <b href="#STOCKMARKETAI">Stock Market AI</b>
   </div>
-  <form class="message-form">
-    {%csrf_token%}
-    <div class="input-group">
-      <input type="text" class="form-control message-input" placeholder="Type your message...">
-      <div class="input-group-append">
-        <button type="submit" class="btn btn-primary btn-send">Send</button>
-      </div>
-    </div>
-  </form>
-</div>
 
-<script>
-  const messagesList = document.querySelector('.messages-list');
-  const messageForm = document.querySelector('.message-form');
-  const messageInput = document.querySelector('.message-input');
-
-  messageForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-
-    const message = messageInput.value.trim();
-    if (message.length === 0) {
-      return;
+  <style>
+    .message-sender{
+      color: white;
     }
-
-    const messageItem = document.createElement('li');
-    messageItem.classList.add('message', 'sent');
-    messageItem.innerHTML = `
+  </style>
+  <style>
+    .message-content {
+      color: white;
+    }
+  </style>
+  <div class="card-body messages-box">
+      
+    <ul class="list-unstyled messages-list">
+      
+       <li class="message received">
         <div class="message-text">
-            <div class="message-sender">
-                <b>You</b>
-            </div>
-            <div class="message-content">
-                ${message}
-            </div>
-        </div>`;
-    messagesList.appendChild(messageItem);
-
-    messageInput.value = '';
-
-    fetch('', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-        'message': message
-      })
-    })
-      .then(response => response.json())
-      .then(data => {
-        const response = data.response;
-        const messageItem = document.createElement('li');
-        messageItem.classList.add('message', 'received');
-        messageItem.innerHTML = `
-        <div class="message-text">
-            <div class="message-sender">
-              <b>AI Chatbot</b>
-            </div>
-            <div class="message-content">
-                ${response}
-            </div>
+          <div class="message-sender">
+            <b>Stock Market AI</b>
+          </div>
+          <style>
+          .message-sender{
+            color: white;
+          }
+        </style>
+          <div class="message-content">
+           Hi {{user.username}}, I am an Stock Market Chat bot I would you help in choosing the best place invest your money.
+          </div>
+          <style>
+          .message-content {
+            color: white;
+          }
+        </style>
         </div>
-          `;
-        messagesList.appendChild(messageItem);
-      });
-  });
+      </li>
 
-</script>
-{% endblock %}
+      {% for chat in chats %}
+        {% if chat.user == request.user %}
+
+          <li class="message sent">
+        <div class="message-text">
+          <div class="message-sender">
+            <b>You</b>
+          </div>
+          <div class="message-content">
+            {{chat.message}}
+          </div>
+        </div>
+      </li>
+
+      <li class="message received">
+        <div class="message-text">
+          <div class="message-sender">
+            <b>StockMarketAI</b>
+          </div>
+          <div class="message-content">
+            {{chat.response}}
+          </div>
+        </div>
+      </li>
+
+        {% endif %}
+      {% endfor %}
+      
+    </ul>
+    
+  </div>
+  <div id="chat-container"></div>
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button id="send-button">Send</button>
+  </div>
+  
+  <script>
+      const chatContainer = document.getElementById("chat-container");
+      const userInput = document.getElementById("user-input");
+      const sendButton = document.getElementById("send-button");
+    document.addEventListener("DOMContentLoaded", function() {
+      fetchData();
+      function addMessage(message, sender) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = sender;
+        messageDiv.textContent = message;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      function processUserInput() {
+        const userMessage = userInput.value.trim();
+        if (userMessage !== "") {
+          addMessage("You:" +userMessage, "user");
+          const botResponse = "StockMarketAI: This is a placeholder response for stock market-related queries.";
+          addMessage(botResponse, "StockMarketAI");
+          userInput.value = "";
+          return 0;
+        }
+      }
+      sendButton.addEventListener("click", processUserInput);
+      userInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+          processUserInput();
+        }
+      });
+    });
+    function fetchData() {
+      fetch("https://developers.generativeai.google/api")
+          .then(response => response.json())
+          .then(data => {
+              displayData(data);
+          })
+          .catch(error => {
+              console.error('Error fetching data:', error);
+          });
+  }
+
+  
+
+  </script>
+</body>
+</html>
