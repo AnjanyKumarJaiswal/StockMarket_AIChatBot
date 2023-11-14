@@ -83,7 +83,7 @@
     <a href=""http://127.0.0.1:8000/"">Home</a>
     <a href="https://www.moneycontrol.com/stocksmarketsindia/" target="_blank">News</a>
     <a href="#contact">Contact</a>
-    <a href="file:///D:/ANJANY_IMPORTANT_FILES/Programming_goals/Python_Programming/Mini_Project/django_chatbot/templates/Login-Page.html">Sign Up/Login In</a>
+    <a href=“Login-Page.html” target=“Landing Page”>Sign Up/Login In</a>
     <b href="#STOCKMARKETAI">Stock Market AI</b>
   </div>
 
@@ -163,8 +163,6 @@
       const chatContainer = document.getElementById("chat-container");
       const userInput = document.getElementById("user-input");
       const sendButton = document.getElementById("send-button");
-    document.addEventListener("DOMContentLoaded", function() {
-      fetchData();
       function addMessage(message, sender) {
         const messageDiv = document.createElement("div");
         messageDiv.className = sender;
@@ -176,8 +174,22 @@
         const userMessage = userInput.value.trim();
         if (userMessage !== "") {
           addMessage("You:" +userMessage, "user");
-          const botResponse = "StockMarketAI: This is a placeholder response for stock market-related queries.";
-          addMessage(botResponse, "StockMarketAI");
+          function chat(){
+            var chatRequest = new XMLHttpRequest();
+            chatRequest.open("GET","/palmapi/?prompt=" + userInput.value);
+            chatRequest.onload = function(){
+              if (chatRequest.status === 200){
+                addMessage(chatRequest.responseText, "StockMarketAI");
+              }
+              else {
+                console.log("Error sending chat request to PaLm API :" + chatRequest.responseText);
+      
+              }
+            };
+            chatRequest.send();
+          }
+          chat();
+          addMessage(chatRequest.responseText, "StockMarketAI");
           userInput.value = "";
           return 0;
         }
@@ -189,16 +201,9 @@
         }
       });
     });
-    function fetchData() {
-      fetch("https://developers.generativeai.google/api")
-          .then(response => response.json())
-          .then(data => {
-              displayData(data);
-          })
-          .catch(error => {
-              console.error('Error fetching data:', error);
-          });
-  }
+    
+    
+  
 
   
 
