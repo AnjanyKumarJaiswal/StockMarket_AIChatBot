@@ -80,10 +80,10 @@
 </head>
 <body>
   <div id="navbar">
-    <a href=""http://127.0.0.1:8000/"">Home</a>
+    <a href="http://127.0.0.1:8000/">Home</a>
     <a href="https://www.moneycontrol.com/stocksmarketsindia/" target="_blank">News</a>
     <a href="#contact">Contact</a>
-    <a href=“Login-Page.html” target=“Landing Page”>Sign Up/Login In</a>
+    <a href="Login-Page.html" target=blank>Sign Up/Login In</a>
     <b href="#STOCKMARKETAI">Stock Market AI</b>
   </div>
 
@@ -158,55 +158,64 @@
     <input type="text" id="user-input" placeholder="Type your message...">
     <button id="send-button">Send</button>
   </div>
-  
-  <script>
-      const chatContainer = document.getElementById("chat-container");
-      const userInput = document.getElementById("user-input");
-      const sendButton = document.getElementById("send-button");
-      function addMessage(message, sender) {
-        const messageDiv = document.createElement("div");
-        messageDiv.className = sender;
-        messageDiv.textContent = message;
-        chatContainer.appendChild(messageDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
-      function processUserInput() {
-        const userMessage = userInput.value.trim();
-        if (userMessage !== "") {
-          addMessage("You:" +userMessage, "user");
-          function chat(){
-            var chatRequest = new XMLHttpRequest();
-            chatRequest.open("GET","/palmapi/?prompt=" + userInput.value);
-            chatRequest.onload = function(){
-              if (chatRequest.status === 200){
-                addMessage(chatRequest.responseText, "StockMarketAI");
-              }
-              else {
-                console.log("Error sending chat request to PaLm API :" + chatRequest.responseText);
-      
-              }
-            };
-            chatRequest.send();
+<script>
+  const chatContainer = document.querySelector(".messages-box");
+    const userInput = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-button");
+
+    function addMessage(message, sender) {
+      const messageDiv = document.createElement("li");
+      messageDiv.className = sender.toLowerCase() + " message";
+      messageDiv.innerHTML = `
+        <div class="message-text">
+          <div class="message-sender">
+            <b>${sender}</b>
+          </div>
+          <div class="message-content">
+            ${message}
+          </div>
+        </div>
+      `;
+      chatContainer.appendChild(messageDiv);
+
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function processUserInput() {
+      let userMessage = userInput.value.trim();
+      if (userMessage !== "") {
+        addMessage("You: " + userMessage, "user");
+
+        var chatRequest = new XMLHttpRequest();
+        chatRequest.open("GET", "/palmapi/?prompt=" + encodeURIComponent(userMessage));
+        chatRequest.onload = function () {
+          if (chatRequest.status === 200) {
+            try {
+              const jsonResponse = JSON.parse(chatRequest.responseText);
+              addMessage("StockMarketAI: " + jsonResponse.response, "StockMarketAI");
+              userInput.value = "";
+            } catch (error) {
+              console.error("Error parsing JSON response:", error);
+            }
+          } else {
+            console.error("Error sending chat request to PaLm API. Status:", chatRequest.status);
           }
-          chat();
-          addMessage(chatRequest.responseText, "StockMarketAI");
-          userInput.value = "";
-          return 0;
-        }
+        };
+        chatRequest.onerror = function () {
+          console.error("Network error while sending chat request to PaLm API.");
+        };
+        chatRequest.send();
       }
-      sendButton.addEventListener("click", processUserInput);
-      userInput.addEventListener("keyup", function(event) {
-        if (event.key === "Enter") {
-          processUserInput();
-        }
-      });
+    }
+    sendButton.addEventListener("click", processUserInput);
+    userInput.addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+        processUserInput();
+      }
     });
-    
-    
-  
+</script>
 
-  
 
-  </script>
+
 </body>
 </html>
